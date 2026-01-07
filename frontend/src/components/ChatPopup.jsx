@@ -6,7 +6,7 @@ const ChatPopup = ({ userName, role }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  // NEW: Track unread messages
+
   const [unreadCount, setUnreadCount] = useState(0); 
   const messagesEndRef = useRef(null);
 
@@ -16,7 +16,7 @@ const ChatPopup = ({ userName, role }) => {
     const handleReceiveChat = (msg) => {
       setMessages((prev) => [...prev, msg]);
       
-      // If chat is closed, increase unread count so the red badge appears
+
       if (!isOpen) {
         setUnreadCount((prev) => prev + 1);
       }
@@ -24,13 +24,13 @@ const ChatPopup = ({ userName, role }) => {
 
     socket.on('receive_chat', handleReceiveChat);
     return () => socket.off('receive_chat', handleReceiveChat);
-  }, [socket, isOpen]); // Re-run listener when isOpen changes
+  }, [socket, isOpen]);
 
-  // Auto-scroll to bottom & Reset count when opening
+
   useEffect(() => {
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      setUnreadCount(0); // Clear notification when you look at the chat
+      setUnreadCount(0); 
     }
   }, [messages, isOpen]);
 
@@ -79,13 +79,13 @@ const ChatPopup = ({ userName, role }) => {
         </div>
       )}
 
-      {/* Toggle Button with Notification Badge */}
+
       <button 
         onClick={toggleChat} 
         className="relative bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg transition transform hover:scale-105"
       >
         💬
-        {/* NEW: Red Badge for Unread Messages */}
+
         {unreadCount > 0 && !isOpen && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white animate-pulse">
             {unreadCount}

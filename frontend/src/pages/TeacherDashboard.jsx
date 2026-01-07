@@ -13,12 +13,12 @@ const TeacherDashboard = () => {
   const [history, setHistory] = useState([]);
   const [activeStudents, setActiveStudents] = useState([]);
 
-  // --- Timer Logic ---
+
   const remainingTime = usePollTimer(currentPoll ? currentPoll.duration : 0, () => {
-    fetchHistory(); // Refresh history when timer ends
+    fetchHistory(); 
   });
 
-  // --- History Logic ---
+
   const fetchHistory = async () => {
     try {
       const res = await fetch('http://localhost:5001/api/polls/history');
@@ -63,21 +63,21 @@ const TeacherDashboard = () => {
     fetchHistory();
   }, []);
 
-  // --- SOCKET SYNC LOGIC (The "Solid" Fix) ---
+
   useEffect(() => {
     if (!socket) return;
 
-    // 1. Immediately ask for the current state on load
-    socket.emit('request_state', {});         // "Is a poll running?"
-    socket.emit('request_participants');      // "Who is connected?"
 
-    // 2. Listen for the Server's answers
+    socket.emit('request_state', {});         
+    socket.emit('request_participants');     
+
+
     socket.on('poll_created', (poll) => {
       setCurrentPoll(poll);
       setResults([]);
     });
 
-    // This handles the answer to 'request_state'
+
     socket.on('sync_state', (poll) => {
       setCurrentPoll(poll);
     });
@@ -86,7 +86,7 @@ const TeacherDashboard = () => {
       setResults(newResults);
     });
 
-    // This handles the answer to 'request_participants'
+
     socket.on('update_student_list', (students) => {
       setActiveStudents(students);
     });
@@ -109,7 +109,7 @@ const TeacherDashboard = () => {
     <div className="min-h-screen bg-gray-50 pb-20 font-sans relative">
       <div className="container mx-auto px-4 py-8">
         
-        {/* Header */}
+
         <header className="mb-8 flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Teacher Dashboard</h1>
@@ -123,7 +123,7 @@ const TeacherDashboard = () => {
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
           
-          {/* COLUMN 1: Create Poll & Student List */}
+
           <div className="xl:col-span-4 space-y-6">
             <PollForm />
             
@@ -152,7 +152,7 @@ const TeacherDashboard = () => {
             </div>
           </div>
 
-          {/* COLUMN 2: Live Monitor */}
+
           <div className="xl:col-span-5 flex flex-col">
              {currentPoll && remainingTime > 0 ? (
               <div className="bg-white p-6 rounded-2xl shadow-lg border border-blue-100 relative overflow-hidden min-h-[400px]">
@@ -173,7 +173,7 @@ const TeacherDashboard = () => {
             )}
           </div>
 
-          {/* COLUMN 3: History & Export */}
+
           <div className="xl:col-span-3">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full max-h-[80vh] flex flex-col">
               <div className="flex justify-between items-center mb-6">

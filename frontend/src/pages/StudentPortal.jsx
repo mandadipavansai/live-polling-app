@@ -8,28 +8,28 @@ import ChatPopup from '../components/ChatPopup';
 const StudentPortal = () => {
   const socket = useSocket();
   
-  // 1. Force Cleanup of localStorage (fix for old bugs)
+
   useEffect(() => {
     localStorage.clear();
   }, []);
 
-  // 2. Use Session Storage (Unique per New Tab)
+
   const [studentName, setStudentName] = useState(sessionStorage.getItem('studentName') || '');
   const [isJoined, setIsJoined] = useState(!!sessionStorage.getItem('studentName'));
   const [poll, setPoll] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [results, setResults] = useState([]);
 
-  // Timer Hook
+
   const remainingTime = usePollTimer(poll ? poll.remainingTime : 0, () => {
     if (!hasVoted) setHasVoted(true); 
   });
 
-  // --- Join Logic ---
+
   const handleJoin = (e) => {
     e.preventDefault();
     if (studentName.trim()) {
-      // Create a UNIQUE ID for this session
+
       const id = `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
       sessionStorage.setItem('studentName', studentName);
@@ -37,13 +37,13 @@ const StudentPortal = () => {
       
       setIsJoined(true);
       
-      // Register with server
+
       socket.emit('student_join', { studentId: id, name: studentName });
       socket.emit('request_state', { studentId: id });
     }
   };
 
-  // --- Resilience: Re-connect on Refresh ---
+
   useEffect(() => {
     if (socket && isJoined) {
       const id = sessionStorage.getItem('studentId');
@@ -58,7 +58,7 @@ const StudentPortal = () => {
     }
   }, [socket, isJoined]);
 
-  // --- Socket Listeners ---
+
   useEffect(() => {
     if (!socket) return;
 
@@ -70,7 +70,7 @@ const StudentPortal = () => {
 
     socket.on('sync_state', (state) => {
       setPoll(state);
-      // Auto-submit logic: Only if the server says this SPECIFIC ID has voted
+
       setHasVoted(state.hasVoted); 
     });
 
@@ -97,7 +97,7 @@ const StudentPortal = () => {
     };
   }, [socket]);
 
-  // --- Vote Handler ---
+
   const handleVote = (index) => {
     if (hasVoted) return;
     const studentId = sessionStorage.getItem('studentId');
@@ -108,7 +108,7 @@ const StudentPortal = () => {
     });
   };
 
-  // --- Logout / Reset Function ---
+
   const handleLogout = () => {
     if(window.confirm("This will disconnect you. Are you sure?")) {
       sessionStorage.clear();
@@ -116,9 +116,9 @@ const StudentPortal = () => {
     }
   };
 
-  // --- UI RENDER ---
 
-  // 1. Login Screen
+
+
   if (!isJoined) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -145,7 +145,7 @@ const StudentPortal = () => {
     );
   }
 
-  // 2. Waiting Screen
+
   if (!poll) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-4 relative">
@@ -153,7 +153,7 @@ const StudentPortal = () => {
         <h2 className="text-2xl font-bold text-gray-800">Waiting for Teacher...</h2>
         <p className="text-gray-500 mt-2 max-w-sm">Please stay on this page.</p>
         
-        {/* Logout Button for Testing */}
+
         <button onClick={handleLogout} className="mt-8 text-sm text-red-500 underline hover:text-red-700">
           Not {studentName}? Logout
         </button>
@@ -162,7 +162,7 @@ const StudentPortal = () => {
     );
   }
 
-  // 3. Active Poll Screen
+
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 flex flex-col items-center relative">
       <div className="w-full max-w-xl">
@@ -178,7 +178,7 @@ const StudentPortal = () => {
           )}
         </header>
 
-        {/* Question Card */}
+       
         <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 mb-6 relative overflow-hidden">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 leading-snug">{poll.question}</h2>
           
@@ -193,7 +193,7 @@ const StudentPortal = () => {
                   <span className="w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold mr-4 group-hover:bg-blue-500 group-hover:text-white transition">
                     {String.fromCharCode(65 + index)}
                   </span>
-                  {/* FIX: Handles both String and Object formats */}
+
                   <span className="font-medium text-gray-700 text-lg">
                     {typeof opt === 'object' ? opt.option : opt}
                   </span>
