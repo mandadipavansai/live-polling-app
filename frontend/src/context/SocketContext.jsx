@@ -4,7 +4,8 @@ import io from 'socket.io-client';
 export const SocketContext = createContext();
 
 export const SocketProvider = ({ children }) => {
-  const socket = useMemo(() => io('http://localhost:5001'), []);
+  // UPDATED URL
+  const socket = useMemo(() => io('https://live-polling-761w.onrender.com'), []);
 
   return (
     <SocketContext.Provider value={socket}>

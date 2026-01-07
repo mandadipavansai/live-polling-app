@@ -1,4 +1,3 @@
-// 
 import React, { useState, useEffect } from 'react';
 import PollForm from '../components/PollForm';
 import ResultChart from '../components/ResultChart';
@@ -13,15 +12,14 @@ const TeacherDashboard = () => {
   const [history, setHistory] = useState([]);
   const [activeStudents, setActiveStudents] = useState([]);
 
-
   const remainingTime = usePollTimer(currentPoll ? currentPoll.duration : 0, () => {
     fetchHistory(); 
   });
 
-
   const fetchHistory = async () => {
     try {
-      const res = await fetch('http://localhost:5001/api/polls/history');
+      // UPDATED URL
+      const res = await fetch('https://live-polling-761w.onrender.com/api/polls/history');
       const data = await res.json();
       setHistory(data);
     } catch (err) {
@@ -52,7 +50,8 @@ const TeacherDashboard = () => {
   const handleClearHistory = async () => {
     if (!window.confirm("Are you sure? This will delete all past polls forever.")) return;
     try {
-      await fetch('http://localhost:5001/api/polls/history', { method: 'DELETE' });
+      // UPDATED URL
+      await fetch('https://live-polling-761w.onrender.com/api/polls/history', { method: 'DELETE' });
       setHistory([]); 
     } catch (err) {
       console.error("Failed to clear history", err);
@@ -63,20 +62,16 @@ const TeacherDashboard = () => {
     fetchHistory();
   }, []);
 
-
   useEffect(() => {
     if (!socket) return;
 
-
     socket.emit('request_state', {});         
     socket.emit('request_participants');     
-
 
     socket.on('poll_created', (poll) => {
       setCurrentPoll(poll);
       setResults([]);
     });
-
 
     socket.on('sync_state', (poll) => {
       setCurrentPoll(poll);
@@ -85,7 +80,6 @@ const TeacherDashboard = () => {
     socket.on('update_results', (newResults) => {
       setResults(newResults);
     });
-
 
     socket.on('update_student_list', (students) => {
       setActiveStudents(students);
@@ -109,7 +103,6 @@ const TeacherDashboard = () => {
     <div className="min-h-screen bg-gray-50 pb-20 font-sans relative">
       <div className="container mx-auto px-4 py-8">
         
-
         <header className="mb-8 flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Teacher Dashboard</h1>
@@ -123,7 +116,6 @@ const TeacherDashboard = () => {
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
           
-
           <div className="xl:col-span-4 space-y-6">
             <PollForm />
             
@@ -152,7 +144,6 @@ const TeacherDashboard = () => {
             </div>
           </div>
 
-
           <div className="xl:col-span-5 flex flex-col">
              {currentPoll && remainingTime > 0 ? (
               <div className="bg-white p-6 rounded-2xl shadow-lg border border-blue-100 relative overflow-hidden min-h-[400px]">
@@ -172,7 +163,6 @@ const TeacherDashboard = () => {
               </div>
             )}
           </div>
-
 
           <div className="xl:col-span-3">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full max-h-[80vh] flex flex-col">
